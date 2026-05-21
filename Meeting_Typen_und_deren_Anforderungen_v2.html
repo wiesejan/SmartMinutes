@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting-Leitfaden: Typen & Anforderungen</title>
+    <style>
+        /* --- FARBPALETTE BASIEREND AUF SCREENSHOTS --- */
+        :root {
+            --primary-dark: #053b5e;   /* Dunkelblau aus Header/Palette */
+            --primary-mid: #1e5f85;    /* Etwas helleres Blau für Hover */
+            --bg-light: #eef5f9;       /* Sehr helles Hintergrundblau */
+            --accent-blue: #b9d2e0;    /* Mittelblau aus Palette (Streifen) */
+            --text-dark: #333333;
+            --text-white: #ffffff;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* --- HEADER BEREICH (Screenshot 1 Stil) --- */
+        header {
+            background-color: var(--primary-dark);
+            color: var(--text-white);
+            padding: 2rem 10%;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .subtitle {
+            margin-top: 10px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Progress Bar Look-alike */
+        .progress-container {
+            background-color: rgba(255,255,255,0.2);
+            height: 8px;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto 0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background-color: var(--text-white);
+            width: 35%; /* Statischer Wert für den Look */
+            height: 100%;
+        }
+
+        /* --- NAVIGATION / TABS (Screenshot 1 Buttons) --- */
+        .nav-container {
+            background-color: white;
+            padding: 15px 5%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: white;
+            border: 1px solid #ccc;
+            color: var(--primary-dark);
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--bg-light);
+            border-color: var(--primary-dark);
+        }
+
+        .nav-btn.active {
+            background-color: var(--primary-dark);
+            color: var(--text-white);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* --- CONTENT BEREICH --- */
+        main {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Intro Box */
+        .intro-box {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            border-left: 6px solid var(--primary-dark);
+            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .intro-box h2 { margin-top: 0; color: var(--primary-dark); }
+        .benefit-highlight {
+            font-weight: bold;
+            color: var(--primary-mid);
+        }
+
+        /* Detail Cards (Hidden by default, shown via JS) */
+        .meeting-card {
+            display: none; /* Versteckt */
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .meeting-card.active {
+            display: block; /* Sichtbar */
+        }
+
+        .card-header {
+            background-color: var(--accent-blue);
+            padding: 20px 30px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            color: var(--primary-dark);
+        }
+
+        .card-body {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .card-body { grid-template-columns: 1fr; }
+        }
+
+        .info-block h3 {
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--accent-blue);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .agenda-box {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px dashed #aaa;
+        }
+
+        .copy-text {
+            font-family: monospace;
+            white-space: pre-line;
+            color: #444;
+        }
+
+        .tag {
+            display: inline-block;
+            background: var(--primary-dark);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧠 Praxis-Leitfaden: Meeting-Typen</h1>
+        <div class="subtitle">Definition, Anforderungen & Vorlagen für den Arbeitsalltag</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+    </header>
+
+    <div class="nav-container">
+        <button class="nav-btn active" onclick="showTab('intro')">Einführung</button>
+        <button class="nav-btn" onclick="showTab('austausch')">Austausch</button>
+        <button class="nav-btn" onclick="showTab('info')">Information</button>
+        <button class="nav-btn" onclick="showTab('entscheidung')">Entscheidung</button>
+        <button class="nav-btn" onclick="showTab('brainstorming')">Brainstorming</button>
+        <button class="nav-btn" onclick="showTab('jourfixe')">Jour Fixe</button>
+        <button class="nav-btn" onclick="showTab('retro')">Retrospektive</button>
+        <button class="nav-btn" onclick="showTab('kickoff')">Kick-Start</button>
+        <button class="nav-btn" onclick="showTab('workshop')">Workshop</button>
+    </div>
+
+    <main>
+        <section id="intro" class="meeting-card active">
+            <div class="intro-box" style="border:none; box-shadow:none; margin:0;">
+                <h2>Warum unterscheiden wir Meeting-Typen?</h2>
+                <p>Produktive Meetings müssen vorbereitet werden, aber nicht jeder Meeting-Typ erfordert das gleiche Maß an Vorbereitung. Ziel dieser Maßnahme ist die Definition der verschiedenen Meeting-Typen, eine Nomenklatur für deren Kennzeichnung und eine Empfehlung für den Detailgrad der Vorbereitung.</p>
+                
+                <h3>Der Nutzen (Benefit)</h3>
+                <p class="benefit-highlight">✅ Förderung von Transparenz unterschiedlicher Meeting-Typen.</p>
+                <p class="benefit-highlight">✅ Definition einer klaren Erwartungshaltung hinsichtlich des Detailgrads der Meetingvorbereitung.</p>
+                <p class="benefit-highlight">✅ Effizientere Nutzung der Arbeitszeit durch passende Formate.</p>
+                
+                <p style="margin-top: 20px;"><em>Wählen Sie oben einen Meeting-Typen aus, um Details und Vorlagen zu erhalten.</em></p>
+            </div>
+        </section>
+
+        <section id="austausch" class="meeting-card">
+            <div class="card-header">
+                <h2>☕ Austausch (informell)</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-block">
+                    <h3>Zweck & Beschreibung</h3>
+                    <p><strong>Zweck:</strong> Kurzer, informeller Austausch zu offenen Fragen.</p>
+                    <p><strong>Beschreibung:</strong> Kein offizielles Protokoll, dient zur Synchronisierung oder um Themen „aus dem Weg zu räumen“.</p>
+                    <h3>Mini-Agenda Anforderungen</h3>
+                    <ul>
+                        <li>Was ist aktuell wichtig?</li>
+                        <li>Wer braucht gerade Unterstützung?</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <h3>📋 Textbaustein für Einladung</h3>
+                    <div class="agenda-box">
+                        <div class="copy-text">
+**Betreff:** Kurzer Austausch / Sync
+
+Hallo zusammen,
+
+lasst uns kurz zusammenkommen, um uns zu synchronisieren.
+
+**Agenda:**
+1. Check-in: Was liegt aktuell an?
+2. Blocker: Wer benötigt Unterstützung?
+3. Offene Fragen / "Themenparkplatz"
+
+Keine Vorbereitung notwendig.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="info" class="meeting-card">
+            <div class="card-header">
+                <h2>📢 Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-block">
+                    <h3>Zweck & Beschreibung</h3>
+                    <p><strong>Zweck:</strong> Wissen oder Updates teilen.</p>
+                    <p><strong>Beschreibung:</strong> One-to-many Kommunikation. Fokus auf Zuhören, Verständnis, ggf. Q&A.</p>
+                    <h3>Mini-Agenda Anforderungen</h3>
+                    <ul>
+                        <li>Agenda/Thema vorstellen</li>
+                        <li>Inhalte/Updates teilen</li>
+                        <li>Fragen klären</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <h3>📋 Textbaustein für Einladung</h3>
+                    <div class="agenda-box">
+                        <div class="copy-text">
+**Betreff:** Info-Session: [Thema]
+
+Hallo Team,
+
+ich möchte euch ein Update zum Thema [Thema] geben.
+
+**Agenda:**
+1. Intro & Zielsetzung (5 Min)
+2. Präsentation der Inhalte / Updates (20 Min)
+3. Q&A - Eure Fragen (15 Min)
+
+Bitte lest vorab das angehängte Dokument, falls vorhanden.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="entscheidung" class="meeting-card">
+            <div class="card-header">
+                <h2>⚖️ Entscheidung</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-block">
+                    <h3>Zweck & Beschreibung</h3>
+                    <p><strong>Zweck:</strong> Eine klare Entscheidung herbeiführen.</p>
+                    <p><strong>Beschreibung:</strong> Input liegt vorab vor; am Ende steht eine verbindliche Entscheidung.</p>
+                    <h3>Mini-Agenda Anforderungen</h3>
+                    <ul>
+                        <li>Entscheidungsthema und Optionen vorstellen</li>
+                        <li>Diskussion/Abwägung</li>
+                        <li>Entscheidung festhalten + nächste Schritte</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <h3>📋 Textbaustein für Einladung</h3>
+                    <div class="agenda-box">
+                        <div class="copy-text">
+**Betreff:** Entscheidung erforderlich: [Thema]
+
+Hallo zusammen,
+
+Ziel des Termins ist eine finale Entscheidung bezüglich [Thema].
+
+**Agenda:**
+1. Vorstellung der Sachlage & Optionen A/B/C
+2. Diskussion & Abwägung (Pro/Contra)
+3. Entscheidung
+4. Definition nächste Schritte
+
+**Vorbereitung:** Bitte sichtet die angehängte Entscheidungsvorlage *vor* dem Termin.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="brainstorming" class="meeting-card">
+            <div class="card-header">
+                <h2>💡 Brainstorming Session</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-block">
+                    <h3>Zweck & Beschreibung</h3>
+                    <p><strong>Zweck:</strong> Ideen generieren, kreativ sein.</p>
+                    <p><strong>Beschreibung:</strong> Freies Denken, keine Bewertung in der Ideenphase. Ziel: viele Optionen auf den Tisch bringen.</p>
+                    <h3>Mini-Agenda Anforderungen</h3>
+                    <ul>
+                        <li>Ziel/Thema definieren</li>
+                        <li>Ideensammlung</li>
+                        <li>Clustern & ggf. priorisieren</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <h3>📋 Textbaustein für Einladung</h3>
+                    <div class="agenda-box">
+                        <div class="copy-text">
+**Betreff:** Ideation / Brainstorming zu [Thema]
+
+Hallo Kreative,
+
+wir brauchen neue Ideen für [Problem/Ziel]. Lasst uns gemeinsam denken!
+
+**Agenda:**
+1. Zielsetzung: Was wollen wir lösen?
+2. Ideation Phase (Divergentes Denken - Quantität vor Qualität)
+3. Clustering & Auswahl (Konvergentes Denken)
+4. Next Steps
+
+Bringt bitte offene Köpfe mit!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="jourfixe" class="meeting-card">
+            <div class="card-header">
+                <h2>🔄 Regeltermin / Jour Fixe</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-block">
+                    <h3>Zweck & Beschreibung</h3>
+                    <p><strong>Zweck:</strong> Kontinuierliche Abstimmung.</p>
+                    <p><strong>Beschreibung:</strong> Fester Rhythmus (wöchentlich, monatlich), um Status, Fortschritt oder Probleme zu besprechen.</p>
+                    <h3>Mini-Agenda Anforderungen</h3>
+                    <ul>
+                        <li>Status-Updates (Runde durch alle)</li>
+                        <li>Offene Punkte klären</li>
+                        <li>To-Dos verteilen</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <h3>📋 Textbaustein für Einladung</h3>
+                    <div class="agenda-box">
+                        <div class="copy-text">
+**Betreff:** Weekly Jour Fixe [Team/Projekt]
+
+Hallo Team,
+
+unser regelmäßiger Check-in zum Projektstatus.
+
+**Agenda:**
+1. Status-Runde (Ampel-Check: Rot/Gelb/Grün)
+2. Besprechung kritischer Blocker
+3. Review offener Aufgaben
+4. Verteilung neuer To-Dos bis nächste Woche
+
+Bitte aktualisiert euren Status im Board vor dem Meeting.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="retro" class="meeting-card">
+            <div class="card-header">
+                <h2>🔍 Retrospektive</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-block">
+                    <h3>Zweck & Beschreibung</h3>
+                    <p><strong>Zweck:</strong> Zusammenarbeit reflektieren und verbessern.</p>
+                    <p><strong>Beschreibung:</strong> Rückblick auf vergangene Phase; Fokus auf Learnings, nicht auf Schuld.</p>
+                    <h3>Mini-Agenda Anforderungen</h3>
+                    <ul>
+                        <li>Was lief gut? / Was war schwierig?</li>
+                        <li>Welche Verbesserung nehmen wir mit?</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <h3>📋 Textbaustein für Einladung</h3>
+                    <div class="agenda-box">
+                        <div class="copy-text">
+**Betreff:** Retro: Rückblick auf [Sprint/Zeitraum]
+
+Hallo zusammen,
+
+lasst uns zurückblicken und lernen, wie wir besser werden können.
+
+**Agenda:**
+1. Set the Stage (Ankommen)
+2. Daten sammeln: Was lief gut? Was lief schlecht?
+3. Einsichten generieren (Warum?)
+4. Maßnahmen beschließen (Action Items)
+5. Abschluss
+
+Regel: Wir suchen Lösungen, keine Schuldigen.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="kickoff" class="meeting-card">
+            <div class="card-header">
+                <h2>🚀 Kick-Off</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-block">
+                    <h3>Zweck & Beschreibung</h3>
+                    <p><strong>Zweck:</strong> Projekt oder Initiative starten.</p>
+                    <p><strong>Beschreibung:</strong> Team kommt zusammen, um Ziele, Rollen und Vorgehen abzustimmen.</p>
+                    <h3>Mini-Agenda Anforderungen</h3>
+                    <ul>
+                        <li>Ziel & Kontext vorstellen</li>
+                        <li>Rollen & Verantwortlichkeiten klären</li>
+                        <li>Erste Schritte & Timeline festlegen</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <h3>📋 Textbaustein für Einladung</h3>
+                    <div class="agenda-box">
+                        <div class="copy-text">
+**Betreff:** Kick-Off: Projekt [Name]
+
+Hallo Projektteam,
+
+wir starten gemeinsam in das neue Projekt [Name]!
+
+**Agenda:**
+1. Vision, Ziel & Kontext (Das "Warum")
+2. Wer macht was? (Rollen & Verantwortlichkeiten)
+3. Grober Zeitplan & Meilensteine
+4. Arbeitsweise & Tools
+5. Erste konkrete Schritte
+
+Bitte sichtet das angehängte Briefing vorab.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workshop" class="meeting-card">
+            <div class="card-header">
+                <h2>🛠️ Hackathon / Workshop</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-block">
+                    <h3>Zweck & Beschreibung</h3>
+                    <p><strong>Zweck:</strong> Intensives, kollaboratives Arbeiten an einem Thema.</p>
+                    <p><strong>Beschreibung:</strong> Kreativer, zeitlich begrenzter Arbeitsblock, oft cross-funktional.</p>
+                    <h3>Mini-Agenda Anforderungen</h3>
+                    <ul>
+                        <li>Ziel/Thema definieren</li>
+                        <li>Arbeitsphasen (alle erarbeiten Ergebnisse)</li>
+                        <li>Präsentation & Ausblick</li>
+                    </ul>
+                </div>
+                <div class="info-block">
+                    <h3>📋 Textbaustein für Einladung</h3>
+                    <div class="agenda-box">
+                        <div class="copy-text">
+**Betreff:** Workshop: Erarbeitung [Thema]
+
+Hallo zusammen,
+
+wir benötigen einen fokussierten Deep-Dive für [Thema].
+
+**Agenda:**
+1. Intro & Zieldefinition (15 Min)
+2. Arbeitsphase 1: Analyse (45 Min)
+3. Pause
+4. Arbeitsphase 2: Lösungsentwicklung (60 Min)
+5. Präsentation der Ergebnisse & Konsolidierung
+6. Wrap-up
+
+Bitte bringt Laptops und gute Energie mit!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function showTab(tabId) {
+            // Alle Buttons deaktivieren
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Geklickten Button aktivieren
+            // (Wir suchen den Button anhand des onclick Attributs oder wir traversieren, 
+            // hier einfacher Hack: event.target nutzen wir nicht direkt wegen Parameterübergabe, 
+            // sondern suchen den Button der diesen Call macht. 
+            // Sauberer: Loop durch Buttons und prüfen welcher den Tab aufruft)
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Alle Cards ausblenden
+            document.querySelectorAll('.meeting-card').forEach(card => {
+                card.classList.remove('active');
+            });
+
+            // Gewählte Card einblenden
+            document.getElementById(tabId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
+```
