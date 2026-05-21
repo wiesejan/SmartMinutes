@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effiziente Meeting-Protokolle mit Teams & KI</title>
+    <style>
+        /* --- Farbschema --- */
+        :root {
+            --dark-blue: #05456B;
+            --medium-blue: #BCD4E2;
+            --light-blue: #EDF3F7;
+            --white: #FFFFFF;
+            --text-color: #333;
+            --accent-purple: #6264a7; /* Teams Purple für UI Elemente */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-blue);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+        }
+
+        .hero {
+            background-color: var(--dark-blue);
+            color: var(--white);
+            padding: 40px;
+            text-align: center;
+        }
+        .hero h1 { margin: 0; font-size: 2.2em; }
+        .hero p { font-size: 1.1em; opacity: 0.9; margin-top: 10px; }
+
+        .content { padding: 30px 40px; }
+
+        h2 {
+            color: var(--dark-blue);
+            border-bottom: 3px solid var(--medium-blue);
+            padding-bottom: 8px;
+            margin-top: 50px;
+            font-size: 1.6em;
+        }
+
+        h3 { color: var(--dark-blue); font-size: 1.3em; margin-top: 30px; }
+        h4 { color: var(--dark-blue); margin-bottom: 5px; font-weight: 600; }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--medium-blue);
+            margin-top: 10px;
+        }
+        
+        .step-image-container { text-align: center; margin-bottom: 25px; }
+
+        .guideline-box {
+            background-color: var(--medium-blue);
+            border: 2px solid var(--dark-blue);
+            color: var(--dark-blue);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+        .guideline-box img { max-width: 200px; margin-right: 20px; margin-top: 0; border: none; box-shadow: none; }
+
+        .benefit-box {
+            background-color: var(--light-blue);
+            border-left: 5px solid var(--dark-blue);
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .prompt-template {
+            background-color: #f9f9f9;
+            border: 1px dashed var(--dark-blue);
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            font-size: 0.9em;
+        }
+
+        /* --- Inhaltsverzeichnis Style --- */
+        .toc-box {
+            background-color: #fcfcfc;
+            border: 1px solid var(--medium-blue);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 25px 0;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+        }
+        .toc-box h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--medium-blue);
+            padding-bottom: 5px;
+            font-size: 1.2em;
+        }
+        .toc-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        .toc-box li {
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+        .toc-box a {
+            color: var(--dark-blue);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .toc-box a:hover {
+            color: var(--accent-purple);
+            text-decoration: underline;
+        }
+
+
+        /* --- STYLES FÜR FACILITATOR UI MOCKUPS --- */
+        .ui-mockup {
+            background: #f0f0f0;
+            border: 1px solid #d1d1d1;
+            border-radius: 6px;
+            padding: 0;
+            max-width: 650px;
+            margin: 15px auto;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: left;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .ui-top-bar {
+            background: #464775; /* Teams Header Color */
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.85em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .ui-content-area {
+            background: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Loop Component Style for Facilitator */
+        .loop-component {
+            border: 1px solid #e1dfdd;
+            border-radius: 4px;
+            box-shadow: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
+            background: white;
+            margin: 10px 0;
+        }
+        .loop-header {
+            background: linear-gradient(90deg, #fff 0%, #f3f2f1 100%);
+            padding: 8px 12px;
+            border-bottom: 1px solid #edebe9;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #6264a7;
+        }
+        .loop-icon {
+            width: 16px; 
+            height: 16px; 
+            margin-right: 8px;
+            background-color: #6264a7;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .loop-body {
+            padding: 15px;
+            font-size: 0.9em;
+        }
+        .ai-badge {
+            background: linear-gradient(135deg, #d6b3ff, #6264a7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+        .todo-item { display: flex; align-items: flex-start; margin-bottom: 5px; }
+        .checkbox { width: 14px; height: 14px; border: 1px solid #666; border-radius: 50%; margin-right: 8px; margin-top: 3px; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .feature-item {
+            background: white;
+            border: 1px solid var(--medium-blue);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        .feature-item strong { color: var(--dark-blue); display: block; margin-bottom: 3px; }
+
+        .req-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        ul { padding-left: 20px; }
+        li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="hero">
+            <h1>🚀 Smart Minutes: Vom Gespräch zum Protokoll in 5 Minuten</h1>
+            <p>Nie wieder To-Dos vergessen – Nutzen Sie die Kraft von KI-Transkriptionen in MS Teams.</p>
+        </header>
+
+        <main class="content">
+
+            <p>Meetings kosten Zeit – oft mehr, als sie bringen. Entscheidungen versanden, Aufgaben gehen unter, Protokolle fehlen oder entstehen erst viel zu spät. Der Grund: Manuelle Dokumentation frisst Ressourcen und wird deshalb häufig vernachlässigt. Genau hier setzt der Smart Minutes-Leitfaden an. Er zeigt zwei einfache Methoden, wie MS Teams und KI die Protokollerstellung nahezu vollständig automatisieren – ob über Transkript + KI oder mit dem MS-Teams-Facilitator. So entstehen klare, vollständige und verbindliche Protokolle fast wie von selbst.</p>
+            <div class="toc-box">
+                <h3>Inhaltsverzeichnis</h3>
+                <ul>
+                    <li><a href="#richtlinie">1. Richtlinie: Vertrauen und Einwilligung</a></li>
+                    <li><a href="#methode1">2. Methode 1: Protokoll im Nachgang basierend auf Transkript</a></li>
+                    <li><a href="#methode2">3. Methode 2: MS Teams Facilitator (Live-Agent)</a></li>
+                    <li><a href="#nutzung">4. Wann nutze ich was? (Vergleich)</a></li>
+                </ul>
+            </div>
+            <div class="benefit-box">
+                <h3>✨ Der Nutzen</h3>
+                <p>Nachhaltige Dokumentation von Meetinginhalten sowie allen offenen Punkten und To-Dos mit absolut minimalem Aufwand.</p>
+            </div>
+
+            <h4 id="richtlinie"❗️ Richtlinie: Vertrauen und Einwilligung zuerst!</h4>
+            <div class="guideline-box">
+                <p><strong>Wichtig:</strong> Zu Beginn des Termins muss darauf hingewiesen werden, dass eine Aufzeichnung/Transkription erfolgt. Teilnehmenden müssen die Möglichkeit haben zu widersprechen. Frage-Tipp: Ist jemand dagegen?</p>
+            </div>
+
+            <h2 id="methode1">📋 Methode 1: Protokollerstellung anhand Transkript und KI (Copilot) </h2>
+            
+            <h4>Schritt 1: Transkription starten</h4>
+            <p>Klicken Sie in der Teams-Besprechung (nachdem Sie die Zustimmung aller erhalten haben!) auf <strong>"Weitere"</strong> (die drei Punkte) und wählen Sie <strong>"Transkription starten"</strong>. Teams informiert alle Teilnehmenden zusätzlich mit einem Banner.</p>
+            <div class="step-image-container">
+                <img src="01.png" alt="Transkription in MS Teams starten" style="max-width: 600px;">
+            </div>
+
+            <hr style="border: 0; border-top: 2px solid var(--light-blue); margin: 40px 0;">
+            <h4>Schritt 2: Zusammenfassung & Transkript finden</h4>
+            <p>Sobald das Meeting beendet ist, finden Sie im entsprechenden Teams-Chat (oder Kanal) eine Kachel mit den Meeting-Details. Hier können Sie oft schon eine erste KI-"Zusammenfassung" sehen. Für unser Protokoll benötigen wir jedoch das volle Transkript.</p>
+            <div class="step-image-container">
+                <img src="2.png" alt="Meeting-Zusammenfassung im Chat" style="max-width: 600px;">
+            </div>
+
+            <h4>Schritt 3: Transkript als .DOCX herunterladen</h4>
+            <p>Klicken Sie auf die Meeting-Kachel, um die Details zu öffnen. Gehen Sie zum Abschnitt <strong>"Transkript"</strong>. Klicken Sie dort auf den Button <strong>"Herunterladen"</strong> und wählen Sie die Option <strong>"Als .DOCX herunterladen"</strong>. Diese Word-Datei ist die Rohfassung für unsere KI.</p>
+            <div class="step-image-container">
+                <img src="3.png" alt="Transkript als DOCX herunterladen" style="max-width: 600px;">
+            </div>
+
+            <hr style="border: 0; border-top: 2px solid var(--light-blue); margin: 40px 0;">
+            <h4>Schritt 4: Protokollerstellung mit Copilot</h4>
+            <p>Gehen Sie in Ihrer Teams-Seitenleiste auf <strong>"Chat"</strong> und wählen Sie den <strong>"Copilot"</strong> aus. Dies öffnet ein Chatfenster, in dem Sie mit der KI interagieren können.</p>
+            <div class="step-image-container">
+                <img src="4.png" alt="Copilot in Teams Seitenleiste" style="max-width: 400px;">
+            </div>
+            <h4>Schritt 5: Transkript-Datei anhängen</h4>
+            <p>Klicken Sie im Copilot-Chat auf die Büroklammer (oder den Link <strong>"Inhalt hinzufügen"</strong>), um eine Datei anzuhängen. Laden Sie die <code>.docx</code>-Transkriptdatei hoch, die Sie in Schritt 3 heruntergeladen haben.</p>
+            <div class="step-image-container">
+                <img src="5.png" alt="Inhalt in Copilot hinzufügen" style="max-width: 600px;">
+            </div>
+
+            <h4>Schritt 6: Den perfekten Prompt verwenden</h4>
+            <p>Dies ist der magische Schritt. Fügen Sie nun <em>zusammen mit der angehängten Datei</em> einen klaren Arbeitsauftrag (Prompt) ein. Eine bewährte Vorlage finden Sie unten. Dieser Prompt weist die KI an, das Transkript in ein strukturiertes Protokoll umzuwandeln.</p>
+            <div class="step-image-container">
+                <img src="7.png" alt="Prompt und Datei an Copilot senden" style="max-width: 600px;">
+            </div>
+            <div class="prompt-template" style="margin-top: 5px;">
+                <h4>PROMPT VORLAGE (Zum Kopieren)</h4>
+             <pre><code>Bitte fasse das beigefügte Meeting-Transkript in einem klaren, strukturierten Protokoll zusammen.
+Format:
+1. Titel des Meetings (z. B. Thema + Datum)
+2. Teilnehmende (falls aus Transkript erkennbar)
+3. Kurze Zusammenfassung (2–3 Sätze, worum es ging)
+4. Getroffene Entscheidungen (bullet points, klar formuliert)
+5. Offene Fragen (bullet points, falls vorhanden)
+6. To-Dos & Verantwortlichkeiten (bullet points, klar zugeordnet)
+7. Nächste Schritte / nächste Termine (falls erwähnt)
+
+Regeln:
+- Konzentriere dich auf Inhalte, nicht auf jede wörtliche Rede.
+- Fasse Diskussionen knapp zusammen, aber halte Entscheidungen, Aufgaben und Verantwortlichkeiten präzise fest.
+- Entferne Füllwörter, doppelte Aussagen oder irrelevante Nebenbemerkungen.
+- Wenn etwas unklar bleibt, notiere es unter „Offene Fragen“.
+- Formatiere das Ergebnis übersichtlich in Abschnitten mit klaren Überschriften und Stichpunkten.</code></pre>
+        </div>
+
+            <hr style="border: 0; border-top: 2px solid var(--light-blue); margin: 40px 0;">
+            <h4>Schritt 7: Das fertige Protokoll prüfen</h4>
+            <p>Copilot analysiert das Transkript und erstellt in Sekundenschnelle ein vollständiges, strukturiertes Protokoll, das genau Ihrem gewünschten Format entspricht. Es listet alle wichtigen Punkte übersichtlich auf.</p>
+            <div class="step-image-container">
+                <img src="8.png" alt="Ergebnis von Copilot: Teil 1 (Zusammenfassung)" style="margin-bottom: 10px;">
+                <img src="9.png" alt="Ergebnis von Copilot: Teil 2 (Offene Fragen, To-Dos)" style="margin-bottom: 10px;">
+                <img src="10.png" alt="Ergebnis von Copilot: Teil 3 (Nächste Schritte)">
+            </div>
+            
+            <h4>Schritt 8: Exportieren und Verteilen</h4>
+            <p>Sie können dieses Protokoll nun direkt aus Copilot heraus kopieren, als PDF/Word exportieren (je nach Copilot-Version) und an alle Teilnehmenden oder im entsprechenden Teams-Kanal teilen. <strong>WICHTIG:</strong> Lesen Sie das Protokoll immer kurz gegen, um sicherzustellen, dass die KI alle Nuancen korrekt erfasst hat.</p>
+
+            
+            <h3>✅ Empfehlung & Pro-Tipps</h3>
+            
+            <h4>Für welche Meetings ist das ideal?</h4>
+            <p>Diese Methode ist besonders wertvoll für:</p>
+            <ul>
+                <li><strong>Projekt-Kick-offs & Workshops:</strong> Bei denen viele Ideen gesammelt und Aufgaben verteilt werden.</li>
+                <li><strong>Wichtige Abstimmungsrunden & Lenkungsausschüsse:</strong> Wenn getroffene Entscheidungen präzise und revisionssicher dokumentiert werden müssen.</li>
+                <li><strong>Regelmäßige Team-Meetings:</strong> Um den Überblick über laufende Aufgaben und Verantwortlichkeiten zu behalten.</li>
+                <li><strong>Wissensübergaben:</strong> Um komplexe Inhalte für Teammitglieder festzuhalten, die nicht teilnehmen konnten.</li>
+            </ul>
+
+            <h4>Pro-Tipp 1: Hybrid- & Offline-Meetings</h4>
+            <p>Der Benefit "offline" wurde erwähnt. Aber wie? Ganz einfach: Nehmen Sie an einem physischen Meeting in einem Konferenzraum teil? Starten Sie auf Ihrem Laptop (oder sogar auf der Teams-Handy-App) die Besprechung, legen Sie das Gerät in die Mitte des Tisches und <strong>starten Sie nur die Transkription</strong> (ohne Anruf oder Video). Das Mikrofon Ihres Geräts zeichnet das Gespräch auf und erstellt ein Transkript des physischen Meetings. Holen Sie auch hier unbedingt die Zustimmung aller Anwesenden ein!</p>
+            
+            <h4>Pro-Tipp 2: Sprecher-Identifikation verbessern</h4>
+            <p>Die Transkription funktioniert am besten, wenn Teams die Stimmen den richtigen Personen zuordnen kann. Dies klappt nur zuverlässig, wenn alle Teilnehmenden über ihr eigenes Teams-Konto im Anruf sind. Ermutigen Sie bei Hybrid-Meetings alle, sich einzeln einzuwählen (Mikrofone dann stummschalten).</p>
+
+
+            <h2 id="methode2">🤖 Methode 2: Der MS Teams Facilitator (Live-Agent)</h2>
+            
+            <p>Der <strong>Microsoft Teams Facilitator</strong> ist ein KI-gestützter Agent, der Besprechungen in Echtzeit moderiert und dokumentiert. Anders als bei Methode 1 müssen Sie hier nicht bis zum Ende warten: Der Facilitator schreibt live mit, sichtbar für alle.</p>
+
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <strong>📝 Echtzeit-Notizen</strong>
+                    Erfasst und transkribiert alles Gesagte sofort und sichtbar.
+                </div>
+                <div class="feature-item">
+                    <strong>✅ Aufgaben & Entscheidungen</strong>
+                    Erkennt automatisch To-Dos und fügt sie der Liste hinzu.
+                </div>
+                <div class="feature-item">
+                    <strong>⚖️ Struktur & Moderation</strong>
+                    Erinnert an die Agenda und hält die Diskussion auf Kurs.
+                </div>
+                <div class="feature-item">
+                    <strong>💬 Fragenbeantwortung</strong>
+                    Beantwortet Fragen zum Meeting-Kontext direkt im Chat.
+                </div>
+            </div>
+
+            <div class="req-box">
+                ⚠️ <strong>Anforderung:</strong> Benötigt eine Microsoft 365 Copilot-Lizenz. Daten werden sicher als <code>.loop</code>-Datei in OneDrive gespeichert (Microsoft Purview Compliance).
+            </div>
+
+            <h3>So funktioniert es: Schritt für Schritt</h3>
+
+            <h4>1. Aktivierung (Vor oder im Meeting)</h4>
+            <p>Sie können den Facilitator bei der Planung hinzufügen oder spontan im laufenden Meeting aktivieren.</p>
+            
+            <div class="ui-mockup">
+                <div class="ui-top-bar">
+                    <span>Teams Meeting</span>
+                    <span>00:15:23</span>
+                </div>
+                <div class="ui-content-area" style="text-align: center;">
+                    <p style="margin-bottom: 15px;">Klicken Sie in der Meeting-Leiste auf <strong>"Apps" (+)</strong> oder nutzen Sie den Copilot-Button.</p>
+                    <div style="display: inline-block; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-weight: bold;">+ Apps hinzufügen</span>
+                        </div>
+                        <div style="border-top: 1px solid #eee; padding-top: 10px; text-align: left;">
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #f09, #3cf); border-radius: 50%; margin-right: 10px;"></div>
+                                <strong>Facilitator / Copilot</strong>
+                                <button style="margin-left: auto; background: #6264a7; color: white; border: none; padding: 3px 8px; border-radius: 3px; font-size: 0.8em;">Hinzufügen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h4>2. Während des Meetings: Live-Dokumentation</h4>
+            <p>Der Facilitator agiert nun <strong>öffentlich sichtbar</strong> im Besprechungschat oder im Bereich "Notizen". Alle Teilnehmer sehen, wie die KI mitschreibt und können korrigierend eingreifen.</p>
+
+            <div class="ui-mockup">
+                <div class="ui-top-bar">
+                    <span>Besprechungschat / Notizen</span>
+                    <span>👥 Alle Teilnehmer</span>
+                </div>
+                <div class="ui-content-area" style="background: #f3f2f1;">
+                    
+                    <div class="loop-component">
+                        <div class="loop-header">
+                            <span class="loop-icon"></span> KI-Besprechungsnotizen (Live)
+                        </div>
+                        <div class="loop-body">
+                            <p style="color: #666; font-size: 0.85em; margin-bottom: 10px;">
+                                <span class="ai-badge">KI</span> <em>Generiert aus dem Transkript...</em>
+                            </p>
+                            
+                            <strong>🎯 Ziele & Agenda</strong>
+                            <ul style="margin-top: 5px; list-style-type: disc;">
+                                <li>Abstimmung Marketing Q3 (Erledigt)</li>
+                                <li>Budgetfreigabe (In Diskussion)</li>
+                            </ul>
+
+                            <strong style="display:block; margin-top: 15px;">✅ Entscheidungen</strong>
+                            <ul style="margin-top: 5px;">
+                                <li>Launch-Termin ist auf den 15.09. festgelegt.</li>
+                            </ul>
+
+                            <strong style="display:block; margin-top: 15px;">📌 To-Dos (Automatisch erkannt)</strong>
+                            <div class="todo-item"><div class="checkbox"></div> Jan prüft das Budget bis Freitag.</div>
+                            <div class="todo-item"><div class="checkbox"></div> Merle finalisiert die Präsentation.</div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #e1dfdd; margin-top: 10px;">
+                        <span style="font-weight: bold; color: #6264a7; font-size: 0.9em;">Facilitator</span>
+                        <p style="font-size: 0.9em; margin: 5px 0;">Ich habe notiert, dass Jan das Budget prüft. Gibt es eine Deadline dafür?</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <h4>3. Finaler Output: Das fertige Protokoll</h4>
+            <p>Am Ende des Termins müssen Sie nichts mehr tun. Das <strong>fertige Protokoll inklusive aller ToDos</strong> liegt bereits als <code>.loop</code>-Komponente im Chat vor.</p>
+            <ul>
+                <li><strong>Zugriff:</strong> Jederzeit im Meeting-Chat abrufbar.</li>
+                <li><strong>Weiterverarbeitung:</strong> Inhalte können einfach kopiert, in eine E-Mail eingefügt oder direkt in Planner/To Do übernommen werden.</li>
+                <li><strong>Dynamik:</strong> Da es eine Loop-Datei ist, können Aufgaben auch nach dem Meeting noch abgehakt werden.</li>
+            </ul>
+
+            <hr style="border: 0; border-top: 2px solid var(--medium-blue); margin: 60px 0;">
+
+            <h2 id="nutzung">✅ Wann nutze ich was?</h2>
+            <ul style="font-size: 1.1em;">
+                <li><strong>Methode 1 (Transkript + Prompt):</strong> Für formelle, revisionssichere Protokolle, die als statisches PDF/Word abgelegt werden müssen.</li>
+                <li><strong>Methode 2 (Facilitator):</strong> Für agile Teams, operative Meetings und Workshops, bei denen die sofortige Verfügbarkeit von Aufgaben und eine aktive Moderation wichtiger sind als ein formelles Dokument.</li>
+            </ul>
+
+        </main>
+    </div>
+
+</body>
+</html>
